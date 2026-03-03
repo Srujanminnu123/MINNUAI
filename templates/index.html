@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINNU // SYSTEM ONLINE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- CORE SYSTEM THEME --- */
+        body {
+            margin: 0; height: 100vh;
+            background-color: #020205;
+            color: #00f3ff;
+            font-family: 'Rajdhani', sans-serif;
+            overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* DIGITAL GRID BACKGROUND */
+        body::before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -2;
+        }
+
+        /* MOVING SCANLINE EFFECT */
+        body::after {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 243, 255, 0.02) 51%, transparent 52%);
+            background-size: 100% 10px;
+            animation: scanline 10s linear infinite;
+            pointer-events: none; z-index: -1;
+        }
+        @keyframes scanline { 0% { background-position: 0 0; } 100% { background-position: 0 100%; } }
+
+        /* --- THE MAIN HUD CONTAINER --- */
+        .hud-container {
+            width: 90%; max-width: 1000px; height: 85vh;
+            position: relative;
+            background: rgba(2, 10, 20, 0.7);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.1), inset 0 0 100px rgba(0, 243, 255, 0.05);
+            display: flex; flex-direction: column;
+            backdrop-filter: blur(5px);
+        }
+
+        /* --- TECH CORNERS (The "Jarvis" Brackets) --- */
+        .corner {
+            position: absolute; width: 40px; height: 40px;
+            border: 3px solid #00f3ff;
+            box-shadow: 0 0 15px #00f3ff;
+            z-index: 10;
+        }
+        .tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+        .tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+        .bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+        .br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+        /* --- HEADER --- */
+        .header {
+            padding: 20px; text-align: center;
+            border-bottom: 2px solid rgba(0, 243, 255, 0.2);
+            background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.1), transparent);
+            position: relative;
+        }
+        .header h1 {
+            margin: 0; font-family: 'Orbitron', sans-serif;
+            font-size: 36px; letter-spacing: 10px;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px #00f3ff;
+            color: #fff;
+        }
+        .header-sub { font-size: 12px; letter-spacing: 5px; opacity: 0.7; margin-top: 5px; }
+
+        /* --- CHAT BOX --- */
+        #chat-box {
+            flex: 1; padding: 30px;
+            overflow-y: auto;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        #chat-box::-webkit-scrollbar { width: 6px; }
+        #chat-box::-webkit-scrollbar-thumb { background: #00f3ff; border-radius: 3px; }
+
+        /* MESSAGES */
+        .msg {
+            max-width: 80%; padding: 15px 20px;
+            font-size: 18px; line-height: 1.5;
+            position: relative; border-radius: 5px;
+        }
+
+        .minnu {
+            align-self: flex-start;
+            background: rgba(0, 243, 255, 0.05);
+            border-left: 4px solid #00f3ff;
+            color: #ccffff;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+        }
+        .minnu::before { content: "AI SYSTEM"; font-size: 10px; color: #00f3ff; display: block; margin-bottom: 5px; opacity: 0.7; letter-spacing: 2px; }
+
+        .user {
+            align-self: flex-end;
+            background: rgba(255, 255, 255, 0.05);
+            border-right: 4px solid #fff;
+            color: #fff; text-align: right;
+        }
+
+        /* --- INPUT AREA --- */
+        .input-area {
+            padding: 20px;
+            background: rgba(0, 5, 10, 0.9);
+            border-top: 1px solid rgba(0, 243, 255, 0.3);
+            display: flex; gap: 15px; align-items: center;
+        }
+
+        input {
+            flex: 1; background: transparent;
+            border: 1px solid rgba(0, 243, 255, 0.5);
+            padding: 15px; color: #00f3ff;
+            font-family: 'Rajdhani', sans-serif; font-size: 18px;
+            outline: none; letter-spacing: 2px;
+            box-shadow: inset 0 0 10px rgba(0, 243, 255, 0.1);
+            transition: 0.3s;
+        }
+        input:focus { box-shadow: 0 0 20px rgba(0, 243, 255, 0.3); border-color: #00f3ff; }
+
+        /* BUTTONS */
+        button {
+            background: transparent; border: 1px solid #00f3ff;
+            color: #00f3ff; padding: 0 30px; height: 50px;
+            font-family: 'Orbitron', sans-serif; font-weight: bold;
+            cursor: pointer; transition: 0.3s; font-size: 14px; letter-spacing: 2px;
+            text-transform: uppercase;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+        }
+        button:hover { background: #00f3ff; color: #000; box-shadow: 0 0 25px #00f3ff; }
+
+        .mic-btn { width: 50px; padding: 0; font-size: 24px; clip-path: circle(40%); display: flex; align-items: center; justify-content: center; }
+        .mic-active { background: #ff004c !important; border-color: #ff004c !important; color: white !important; box-shadow: 0 0 25px #ff004c; animation: pulse 1s infinite; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* LINKS & IMAGES */
+        .hud-btn { display: inline-block; margin-top: 10px; padding: 8px 15px; border: 1px solid #00f3ff; color: #00f3ff; text-decoration: none; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s; background: rgba(0, 243, 255, 0.1); }
+        .hud-btn:hover { background: #00f3ff; color: #000; }
+
+        .holo-image-container { margin-top: 10px; padding: 5px; border: 1px solid #00f3ff; box-shadow: 0 0 20px rgba(0, 243, 255, 0.2); display: inline-block; background: rgba(0,0,0,0.5); }
+        .holo-img { max-width: 100%; display: block; filter: contrast(1.2) brightness(1.1); }
+
+    </style>
+</head>
+<body>
+
+    <div class="hud-container">
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+
+        <div class="header">
+            <h1>MINNU</h1>
+            <div class="header-sub">VIRTUAL ASSISTANT V2.0</div>
+        </div>
+
+        <div id="chat-box">
+            <div class="msg minnu">
+                SYSTEM INITIALIZED.<br>
+                Awaiting your command.
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="ENTER COMMAND..." onkeypress="if(event.key === 'Enter') sendMsg()">
+            <button onclick="toggleVoice()" class="mic-btn" id="micBtn">🎤</button>
+            <button onclick="sendMsg()">INITIATE</button>
+        </div>
+    </div>
+
+    <script>
+        var recognition;
+        var isListening = false;
+
+        function sendMsg() {
+            var input = document.getElementById("userInput");
+            var val = input.value;
+            if (!val.trim()) return;
+
+            var box = document.getElementById("chat-box");
+            box.innerHTML += `<div class="msg user">${val}</div>`;
+            input.value = "";
+            box.scrollTop = box.scrollHeight;
+            stopVoice();
+
+            fetch('/ask', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'message=' + encodeURIComponent(val)
+            })
+            .then(res => res.json())
+            .then(data => {
+                box.innerHTML += `<div class="msg minnu">${data.response}</div>`;
+
+                // Open Links Automatically
+                var tempDiv = document.createElement('div');
+                tempDiv.innerHTML = data.response;
+                var scripts = tempDiv.getElementsByTagName('script');
+                for(var i=0; i<scripts.length; i++) { eval(scripts[i].innerText); }
+
+                box.scrollTop = box.scrollHeight;
+                speakText(data.response);
+            });
+        }
+
+        function speakText(text) {
+            window.speechSynthesis.cancel();
+            var cleanText = text.replace(/<[^>]*>/g, '').replace("Visualizing:", "Generating visual.");
+            var speech = new SpeechSynthesisUtterance(cleanText);
+
+            // Robot Voice settings
+            speech.rate = 1.0;
+            speech.pitch = 0.9;
+            window.speechSynthesis.speak(speech);
+        }
+
+        function toggleVoice() {
+            if (isListening) stopVoice();
+            else startVoice();
+        }
+
+        function startVoice() {
+            if (!('webkitSpeechRecognition' in window)) { alert("Use Chrome!"); return; }
+            recognition = new webkitSpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.continuous = false;
+
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById("micBtn").classList.add("mic-active");
+                document.getElementById("userInput").placeholder = "LISTENING...";
+            };
+            recognition.onresult = function(event) {
+                var transcript = event.results[0][0].transcript;
+                document.getElementById("userInput").value = transcript;
+                sendMsg();
+            };
+            recognition.onend = stopVoice;
+            recognition.onerror = stopVoice;
+            recognition.start();
+        }
+
+        function stopVoice() {
+            isListening = false;
+            document.getElementById("micBtn").classList.remove("mic-active");
+            document.getElementById("userInput").placeholder = "ENTER COMMAND...";
+            if (recognition) recognition.stop();
+        }
+    </script>
+</body>
+</html>
